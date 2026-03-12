@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Hospital Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #050505;
+            --panel-bg: rgba(10, 10, 15, 0.7);
+            --neon-blue: #00f3ff;
+            --neon-pink: #ff00ea;
+            --neon-green: #39ff14;
+            --neon-red: #ff3333;
+            --text-main: #e0e0e0;
+            --text-muted: #888;
+            --border-color: rgba(0, 243, 255, 0.3);
+            --glass-blur: blur(12px);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(0, 243, 255, 0.05), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(255, 0, 234, 0.05), transparent 25%);
+            color: var(--text-main);
+            padding: 40px 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0.4;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 40px;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue), 0 0 40px var(--neon-blue);
+            animation: pulse 2s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { text-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue); }
+            100% { text-shadow: 0 0 15px var(--neon-blue), 0 0 30px var(--neon-blue), 0 0 50px var(--neon-blue); }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                grid-template-columns: 350px 1fr;
+            }
+        }
+
+        .card {
+            background: var(--panel-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--border-color);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: inset 0 0 20px rgba(0, 243, 255, 0.05), 0 10px 30px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: inset 0 0 20px rgba(0, 243, 255, 0.1), 0 15px 40px rgba(0, 0, 0, 0.6), 0 0 15px rgba(0, 243, 255, 0.2);
+        }
+
+        .card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.05), transparent);
+            transform: skewX(-25deg);
+            animation: scanline 6s linear infinite;
+        }
+
+        @keyframes scanline {
+            0% { left: -100%; }
+            20% { left: 200%; }
+            100% { left: 200%; }
+        }
+
+        .card-title {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-pink);
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 0, 234, 0.3);
+            padding-bottom: 10px;
+            text-shadow: 0 0 5px var(--neon-pink);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border-radius: 5px;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+            background: rgba(0, 243, 255, 0.05);
+        }
+        
+        select option {
+            background: #111;
+            color: #fff;
+        }
+
+        input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .search-box input {
+            padding-left: 45px;
+            border-color: var(--neon-pink);
+            border-radius: 25px;
+        }
+
+        .search-box input:focus {
+            border-color: #fff;
+            box-shadow: 0 0 15px rgba(255, 0, 234, 0.4);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--neon-pink);
+            font-size: 1.2rem;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: transparent;
+            border: 2px solid var(--neon-blue);
+            color: var(--neon-blue);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.2) inset;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:hover {
+            background: var(--neon-blue);
+            color: #000;
+            box-shadow: 0 0 20px var(--neon-blue);
+            text-shadow: none;
+        }
+
+        .btn-action {
+            width: auto;
+            padding: 6px 12px;
+            font-size: 0.9rem;
+            margin-right: 5px;
+        }
+        
+        .btn-edit {
+            border-color: var(--neon-green);
+            color: var(--neon-green);
+            box-shadow: 0 0 10px rgba(57, 255, 20, 0.2) inset;
+        }
+
+        .btn-edit:hover {
+            background: var(--neon-green);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-green);
+        }
+
+        .btn-delete {
+            border-color: var(--neon-red);
+            color: var(--neon-red);
+            box-shadow: 0 0 10px rgba(255, 51, 51, 0.2) inset;
+        }
+
+        .btn-delete:hover {
+            background: var(--neon-red);
+            color: #fff;
+            box-shadow: 0 0 15px var(--neon-red);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            background: rgba(0,0,0,0.3);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            min-width: 600px;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        th {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-blue);
+            font-weight: 500;
+            letter-spacing: 1px;
+            background: rgba(0, 243, 255, 0.05);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+
+        tr {
+            transition: background 0.3s ease;
+        }
+
+        tbody tr:hover {
+            background: rgba(255, 255, 255, 0.03);
+            box-shadow: inset 2px 0 0 var(--neon-pink);
+        }
+
+        tbody td {
+            font-size: 1.1rem;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color); 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 243, 255, 0.3); 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--neon-blue); 
+        }
+        
+    </style>
+</head>
+<body>
+
+    <h1>Neon Care Hospital</h1>
+
+    <div class="container">
+        <!-- Input Form Card -->
+        <div class="card">
+            <h2 class="card-title" id="formTitle">Add Patient</h2>
+            
+            <div class="form-group">
+                <input id="name" placeholder="Patient Name" autocomplete="off">
+            </div>
+            
+            <div class="form-group">
+                <input id="age" type="number" placeholder="Age" autocomplete="off">
+            </div>
+            
+            <div class="form-group">
+                <select id="gender">
+                    <option value="" disabled selected>Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <input id="phone" placeholder="Phone Number" autocomplete="off">
+            </div>
+            
+            <div class="form-group">
+                <input id="disease" placeholder="Diagnosis / Disease" autocomplete="off">
+            </div>
+            
+            <div class="form-group">
+                <input id="doctor" placeholder="Assigned Doctor" autocomplete="off">
+            </div>
+            
+            <button onclick="savePatient()" id="submitBtn">Initialize Record</button>
+        </div>
+
+
+        <!-- Table Card -->
+        <div class="card">
+            <h2 class="card-title">Database Records</h2>
+            
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input id="search" placeholder="Search by name, disease or doctor..." onkeyup="searchPatients()" autocomplete="off">
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Patient Name</th>
+                            <th>Diagnosis</th>
+                            <th>Doctor</th>
+                            <th>Directives</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table">
+                        <!-- Rows will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        const API = "/patients";
+        let patients = [];
+        let editId = null;
+
+        async function loadPatients() {
+            try {
+                const res = await fetch(API);
+                patients = await res.json();
+                render();
+            } catch (err) {
+                console.error("Failed to load DB", err);
+            }
+        }
+
+        function render() {
+            const table = document.getElementById("table");
+            table.innerHTML = "";
+
+            if(patients.length === 0) {
+                table.innerHTML = `<tr><td colspan="4" style="text-align:center; color: var(--text-muted); font-style: italic;">No records found in database.</td></tr>`;
+                return;
+            }
+
+            patients.forEach(p => {
+                table.innerHTML += `
+                    <tr>
+                        <td style="color: #fff; font-weight: 500;">${p.name || '-'}</td>
+                        <td style="color: var(--neon-pink);">${p.disease || '-'}</td>
+                        <td style="color: var(--neon-blue);">${p.doctor || '-'}</td>
+                        <td>
+                            <button class="btn-action btn-edit" onclick="editPatient('${p._id}')">EXEC_MOD</button>
+                            <button class="btn-action btn-delete" onclick="deletePatient('${p._id}')">DEL_REC</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        async function savePatient() {
+            const submitBtn = document.getElementById("submitBtn");
+            const originalText = submitBtn.innerText;
+            submitBtn.innerText = "PROCESSING...";
+            submitBtn.style.pointerEvents = "none";
+
+            const patient = {
+                name: document.getElementById('name').value,
+                age: document.getElementById('age').value,
+                gender: document.getElementById('gender').value,
+                phone: document.getElementById('phone').value,
+                disease: document.getElementById('disease').value,
+                doctor: document.getElementById('doctor').value
+            };
+
+            try {
+                if (editId) {
+                    await fetch(API + "/" + editId, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(patient)
+                    });
+                    editId = null;
+                    document.getElementById('formTitle').innerText = "Add Patient";
+                    submitBtn.innerText = "Initialize Record";
+                } else {
+                    await fetch(API, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(patient)
+                    });
+                    submitBtn.innerText = "Initialize Record";
+                }
+
+                clearForm();
+                await loadPatients();
+            } catch (err) {
+                console.error("Error saving patient", err);
+                submitBtn.innerText = "ERROR";
+                setTimeout(() => submitBtn.innerText = originalText, 2000);
+            } finally {
+                submitBtn.style.pointerEvents = "auto";
+            }
+        }
+
+        function editPatient(id) {
+            const p = patients.find(x => x._id === id);
+            if(!p) return;
+
+            document.getElementById('name').value = p.name || '';
+            document.getElementById('age').value = p.age || '';
+            document.getElementById('gender').value = p.gender || '';
+            document.getElementById('phone').value = p.phone || '';
+            document.getElementById('disease').value = p.disease || '';
+            document.getElementById('doctor').value = p.doctor || '';
+            
+            editId = id;
+            
+            document.getElementById('formTitle').innerText = "Modify Record";
+            const submitBtn = document.getElementById("submitBtn");
+            submitBtn.innerText = "Update Record";
+            
+            // Scroll to form
+            document.querySelector('.card').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        async function deletePatient(id) {
+            if(confirm("CRITICAL: Confirm deletion of record?")) {
+                try {
+                    await fetch(API + "/" + id, { method: "DELETE" });
+                    await loadPatients();
+                } catch(err) {
+                    console.error("Failed to delete", err);
+                }
+            }
+        }
+
+        function clearForm() {
+            document.getElementById('name').value = "";
+            document.getElementById('age').value = "";
+            document.getElementById('gender').value = "";
+            document.getElementById('phone').value = "";
+            document.getElementById('disease').value = "";
+            document.getElementById('doctor').value = "";
+        }
+
+        function searchPatients() {
+            const text = document.getElementById('search').value.toLowerCase();
+            const table = document.getElementById("table");
+            
+            if(!text) {
+                render();
+                return;
+            }
+
+            const filtered = patients.filter(p => 
+                (p.name && p.name.toLowerCase().includes(text)) ||
+                (p.disease && p.disease.toLowerCase().includes(text)) ||
+                (p.doctor && p.doctor.toLowerCase().includes(text))
+            );
+
+            table.innerHTML = "";
+            
+            if(filtered.length === 0) {
+                table.innerHTML = `<tr><td colspan="4" style="text-align:center; color: var(--text-muted); font-style: italic;">No matching records found.</td></tr>`;
+                return;
+            }
+
+            filtered.forEach(p => {
+                table.innerHTML += `
+                    <tr>
+                        <td style="color: #fff; font-weight: 500;">${p.name || '-'}</td>
+                        <td style="color: var(--neon-pink);">${p.disease || '-'}</td>
+                        <td style="color: var(--neon-blue);">${p.doctor || '-'}</td>
+                        <td>
+                            <button class="btn-action btn-edit" onclick="editPatient('${p._id}')">EXEC_MOD</button>
+                            <button class="btn-action btn-delete" onclick="deletePatient('${p._id}')">DEL_REC</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Initialize display
+        loadPatients();
+
+    </script>
+</body>
+</html>
