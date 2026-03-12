@@ -30,32 +30,48 @@ default:Date.now
 const Patient = mongoose.model("Patient",patientSchema);
 
 /* CREATE */
-app.post("/patients",async(req,res)=>{
-const patient = new Patient(req.body);
-await patient.save();
-res.json(patient);
+app.post("/patients", async(req, res) => {
+  try {
+    const patient = new Patient(req.body);
+    await patient.save();
+    res.json(patient);
+  } catch(err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 /* GET ALL */
-app.get("/patients",async(req,res)=>{
-const patients = await Patient.find().sort({admissionDate:-1});
-res.json(patients);
+app.get("/patients", async(req, res) => {
+  try {
+    const patients = await Patient.find().sort({admissionDate: -1});
+    res.json(patients);
+  } catch(err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 /* UPDATE */
-app.put("/patients/:id",async(req,res)=>{
-const patient = await Patient.findByIdAndUpdate(
-req.params.id,
-req.body,
-{new:true}
-);
-res.json(patient);
+app.put("/patients/:id", async(req, res) => {
+  try {
+    const patient = await Patient.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      {new: true}
+    );
+    res.json(patient);
+  } catch(err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 /* DELETE */
-app.delete("/patients/:id",async(req,res)=>{
-await Patient.findByIdAndDelete(req.params.id);
-res.json({message:"Deleted"});
+app.delete("/patients/:id", async(req, res) => {
+  try {
+    await Patient.findByIdAndDelete(req.params.id);
+    res.json({message: "Deleted"});
+  } catch(err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 /* Server */
